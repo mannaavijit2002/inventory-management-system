@@ -1,19 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const productRoutes = require('./routes/products');
-
 const app = express();
-const port = process.env.PORT || 5001;
 
-mongoose.connect('mongodb://localhost:27017/inventory', { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Could not connect to MongoDB', err));
+mongoose.connect('mongodb://localhost/inventory', { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('Connected to Database'));
 
 app.use(cors());
 app.use(express.json());
-app.use('/products', productRoutes);
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+const productsRouter = require('./routes/products');
+app.use('/api/products', productsRouter);
+
+app.listen(3000, () => console.log('Server Started'));
